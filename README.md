@@ -53,24 +53,13 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ...
 ```
 
-- Exemplo de removeById
-
-```javascript
-  ...
-    const orcl = new Oracle(dbora.auth)
-    orcl.removeById({table: 'ex_user', id: 1}).then((res)=>{
-      console.log(data)
-    }).catch(err => console.error(err))
-  ...
-```
-
 - Exemplo de delete com/sem where
 - Se informar que **deleteAll**:**false** vai respeitar a regra do where se estiver como **deleteAll**:**true** ele irá ignorar o where.
 
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    orcl.remove({table: 'ex_user', deleteAll: false, where: { id: 1, email_address: "fulano@ciclano.me" }}).then((res)=>{
+    orcl.delete({table: 'ex_user', deleteAll: false, where: { id: 1, email_address: "fulano@ciclano.me" }}).then((res)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -82,7 +71,7 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    orcl.remove({table: 'ex_user', whereAll: false, where: { id: 1, email_address: "fulano@ciclano.me" }}).then((res)=>{
+    orcl.update({table: 'ex_user', updateAll: false, where: { id: 1, email_address: "fulano@ciclano.me" }}).then((res)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...

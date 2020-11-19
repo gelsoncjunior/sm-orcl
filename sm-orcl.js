@@ -83,7 +83,7 @@ class ORACLE {
     return res
   }
 
-  async remove({ table, deleteAll, where }) {
+  async delete({ table, deleteAll, where }) {
     var isExistWhere = ";"
     var objWhere = []
     if (deleteAll) {
@@ -94,11 +94,6 @@ class ORACLE {
     }
     let res = await this.sqlplus('delete ' + table + isExistWhere)
     return res
-  }
-
-  async removeById({ table, id }) {
-    let res = await this.sqlplus(`delete ${table} where id = ${id};`)
-    return res;
   }
 
   async query(query) {
