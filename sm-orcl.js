@@ -45,6 +45,12 @@ class ORACLE {
     }
   }
 
+  async keepAliveDb() {
+    let res = await this.sqlplus('select 1 from dual;')
+    if (res.status === 500) return { status: 0 }
+    return { status: 1 }
+  }
+
   async insert({ table, data }) {
     var patchDataValues = `\'${Object.values(data).join(',').replace(/,/g, '\',\'')}\'`
     let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${patchDataValues} );`)

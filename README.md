@@ -26,6 +26,17 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```
 # Comandos
 
+- keepAliveDb verifica disponibilidade, **status**:**0** é não conectou e **status**:**1** conectou corretamente.
+
+```javascript
+...
+  const orcl = new Oracle(dbora.auth)
+  orcl.keepAliveDb().then((res)=>{
+    console.log(data)
+  }).catch(err => console.error(err))
+...
+```
+
 - Exemplo de insert
 
 ```javascript

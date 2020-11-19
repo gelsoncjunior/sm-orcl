@@ -27,3 +27,4 @@ let where = {
 //orcl.update({ table: 'be_user', data: data }).then(data => console.log(data)).catch(err => console.log(err))
 //orcl.query(`select id from be_user where id = 960;`).then(data => console.log(data)).catch(err => console.log(err))
 //orcl.remove({ table: 'be_user', deleteAll: true, where: where }).then(data => console.log(data)).catch(err => console.log(err))
+orcl.keepAliveDb().then(data => console.log(data))
