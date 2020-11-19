@@ -77,7 +77,7 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```
 
 - Exemplo de update com/sem where
-- Se informar que **whereAll**:**false** vai respeitar a regra do where se estiver como **whereAll**:**true** ele irá ignorar o where.
+- Se informar que **updateAll**:**false** vai respeitar a regra do where se estiver como **updateAll**:**true** ele irá ignorar o where.
 
 ```javascript
   ...

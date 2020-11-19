@@ -69,11 +69,11 @@ class ORACLE {
     return obj
   }
 
-  async update({ table, data, whereAll, where }) {
+  async update({ table, data, updateAll, where }) {
     var isExistWhere = ";"
     let objUpdate = this.objToArrayWithComparisionOfAny(data)
     var objWhere = []
-    if (whereAll) {
+    if (updateAll) {
       isExistWhere = ";"
     } else {
       objWhere = this.objToArrayWithComparisionOfAny(where)
