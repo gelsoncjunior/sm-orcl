@@ -31,7 +31,7 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```javascript
 ...
   const orcl = new Oracle(dbora.auth)
-  orcl.keepAliveDb().then((res)=>{
+  orcl.keepAliveDb().then((data)=>{
     console.log(data)
   }).catch(err => console.error(err))
 ...
@@ -47,7 +47,7 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
     idade: 23,
     sexo: 'masculino'
   }
-  orcl.insert({table: 'ex_user', data: user}).then((res)=>{
+  orcl.insert({table: 'ex_user', data: user}).then((data)=>{
     console.log(data)
   }).catch(err => console.error(err))
 ...
@@ -60,7 +60,7 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
   ...
     const orcl = new Oracle(dbora.auth)
     let whereData = { id: 1, email_address: "fulano@ciclano.me" }
-    orcl.delete({table: 'ex_user', deleteAll: false, where: whereData}).then((res)=>{
+    orcl.delete({table: 'ex_user', deleteAll: false, where: whereData}).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -73,7 +73,7 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
   ...
     const orcl = new Oracle(dbora.auth)
     let whereData = { id: 1, email_address: "fulano@ciclano.me" }
-    orcl.update({table: 'ex_user', updateAll: false, where: whereData }).then((res)=>{
+    orcl.update({table: 'ex_user', updateAll: false, where: whereData }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -101,7 +101,51 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
        sexo => ${user.sexo}
      );
      select name from ex_user;
-    `).then((res)=>{
+    `).then((data)=>{
+      console.log(data)
+    }).catch(err => console.error(err))
+  ...
+```
+
+# DMLS
+Recurso de DML é usado para criação, update e deleção de tabelas.
+
+- Exemplo de uma nova tabela
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+
+    let data = {
+      table: "EX_TESTE",
+      columns: [{
+        name: "id",
+        dataType: "number",
+        length: "",
+        nullable: true,
+        pk: true,
+        unique: true,
+      }, 
+      {
+        name: "name",
+        dataType: "varchar2",
+        length: "(50)",
+        nullable: true,
+        pk: false,
+        unique: true,
+      }, 
+      {
+        name: "idade",
+        dataType: "number",
+        length: "",
+        nullable: false,
+        pk: false,
+        unique: true,
+      }],
+      trigger: true
+    }
+
+   orcl.createTable({table: data.table, columns: data.columns, trigger: data.trigger).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...

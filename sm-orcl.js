@@ -47,8 +47,8 @@ class ORACLE {
 
   async keepAliveDb() {
     let res = await this.sqlplus('select 1 from dual;')
-    if (res.status === 500) return { status: 0 }
-    return { status: 1 }
+    if (res.status === 500) return { status: 0, output: "Failed to connect" }
+    return { status: 1, output: "Successfully connected" }
   }
 
   async insert({ table, data }) {
@@ -101,6 +101,57 @@ class ORACLE {
     if (query.search('begin') !== -1) scape = "/"
     let res = await this.sqlplus(`${query} \n ${scape}`)
     return res
+  }
+
+  async createTable({ table, columns, trigger }) {
+    let columnsTable = []
+    let columnsUniq = []
+    for (const c of columns) {
+      let objValue = Object.values(c)
+      if (c.pk) {
+        columnsTable.push(`${objValue[0]} ${objValue[1]}${objValue[2]} constraint ${table}_pk primary key`)
+      } else if (c.nullable) {
+        columnsTable.push(`${objValue[0]}  ${objValue[1]}${objValue[2]} not null`)
+      } else {
+        columnsTable.push(`${objValue[0]}  ${objValue[1]}${objValue[2]}`)
+      }
+
+      if (c.unique && !c.pk) {
+        columnsUniq.push(`alter table ${table} add constraint ${table}_${objValue[0]}_uq unique (${objValue[0]}); \n`)
+      }
+    }
+    let dml = `
+      create table ${table} (
+        ${columnsTable}
+      );
+      /
+
+    `
+    if (columnsUniq) {
+      dml = dml + columnsUniq.join(',').replace(/,/g, '')
+    }
+
+    if (trigger) {
+      dml = dml + `
+      create or replace trigger biu_${table}
+      before insert or update on ${table}
+      for each row
+      begin
+          if inserting then
+              if :new.id is null then
+                  :new.id := to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+              end if;
+          end if;
+          if updating then
+              null;
+          end if;
+      end;
+      /
+      `
+    }
+    // let res = await this.sqlplus(dml)
+    // return res
+    console.log(dml)
   }
 
 }
