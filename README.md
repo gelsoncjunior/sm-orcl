@@ -59,7 +59,8 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    orcl.delete({table: 'ex_user', deleteAll: false, where: { id: 1, email_address: "fulano@ciclano.me" }}).then((res)=>{
+    let whereData = { id: 1, email_address: "fulano@ciclano.me" }
+    orcl.delete({table: 'ex_user', deleteAll: false, where: whereData}).then((res)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -71,7 +72,8 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    orcl.update({table: 'ex_user', updateAll: false, where: { id: 1, email_address: "fulano@ciclano.me" }}).then((res)=>{
+    let whereData = { id: 1, email_address: "fulano@ciclano.me" }
+    orcl.update({table: 'ex_user', updateAll: false, where: whereData }).then((res)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -90,7 +92,9 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
     }
 
     orcl.query(`
-     inset into ex_user ( name, idade, sexo ) values ( '${user.name}', '${user.idade}', '${user.sexo}' );
+     inset into ex_user ( name, idade, sexo ) values ( 
+       '${user.name}', '${user.idade}', '${user.sexo}' 
+     );
      exec EX_CREATEUSER( 
        name => ${user.name},
        idade => ${user.idade},
