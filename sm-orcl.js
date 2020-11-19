@@ -20,15 +20,7 @@ class ORACLE {
 
   search_ora(output) {
     for (let i of output) {
-      for (let x of i) {
-        if (x.search('ORA-') !== -1) {
-          return {
-            status: 500,
-            data: [],
-            error: x
-          }
-        }
-      }
+      for (let x of i) if (x.search('ORA-') !== -1) return { status: 500, data: [], error: x }
     }
   }
 
@@ -36,7 +28,7 @@ class ORACLE {
     try {
       const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" << EOF \n set pages 0 \n ${sql} \nEOF`)).stdout
       data = response.split("\n").map(arry => { return arry.split("\t") }).filter(el => { return el != '' })
-      //console.log(data)
+      console.log(data)
       if (this.search_ora(data)) return this.search_ora(data)
       return { status: 200, data: data[0], error: error }
     } catch (error) {
@@ -149,9 +141,8 @@ class ORACLE {
       /
       `
     }
-    // let res = await this.sqlplus(dml)
-    // return res
-    console.log(dml)
+    let res = await this.sqlplus(dml)
+    return res
   }
 
 }

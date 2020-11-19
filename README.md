@@ -4,11 +4,11 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 
 # Dependências
 
-- É necessário que tenha instalado o cliente SQLPlus correspondente ao seu banco de dados.
+É necessário que tenha instalado o cliente SQLPlus correspondente ao seu banco de dados.
 
 # Instalação
 
-- Execute o comando <b>npm install --save sm-orcl</b> para obter o pacote.
+Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
 
 # Usando
 
@@ -42,12 +42,12 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```javascript
 ...
   const orcl = new Oracle(dbora.auth)
-  let user = {
+  let payload = {
     name: 'Fulano Sauro',
     idade: 23,
     sexo: 'masculino'
   }
-  orcl.insert({table: 'ex_user', data: user}).then((data)=>{
+  orcl.insert({table: 'ex_user', data: payload}).then((data)=>{
     console.log(data)
   }).catch(err => console.error(err))
 ...
@@ -59,8 +59,8 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    let whereData = { id: 1, email_address: "fulano@ciclano.me" }
-    orcl.delete({table: 'ex_user', deleteAll: false, where: whereData}).then((data)=>{
+    let payload = { id: 1, email_address: "fulano@ciclano.me" }
+    orcl.delete({table: 'ex_user', deleteAll: false, where: payload}).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -72,8 +72,9 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    let whereData = { id: 1, email_address: "fulano@ciclano.me" }
-    orcl.update({table: 'ex_user', updateAll: false, where: whereData }).then((data)=>{
+    let payloadData = { email_address: "ciclano@fulano.you" }
+    let payload = { id: 1, email_address: "fulano@ciclano.me" }
+    orcl.update({table: 'ex_user', updateAll: false, where: payload }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -85,7 +86,7 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
   ...
     const orcl = new Oracle(dbora.auth)
 
-    let user = {
+    let payload = {
       name: 'Fulano Sauro',
       idade: 23,
       sexo: 'masculino'
@@ -107,17 +108,17 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
   ...
 ```
 
-# DMLS
-Recurso de DML é usado para criação, update e deleção de tabelas.
+# DMLs
+Recurso de DML é usado para criação, atualização e deleção de tabelas.
 
 - Exemplo de uma nova tabela
-- **ATENÇÃO**: Por default as informações de **nullable**,**pk** e **unique** são **false**
+- **ATENÇÃO**: Por default as informações de **nullable**, **pk** e **unique** são **false**
 
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
 
-    let data = {
+    let payload = {
       table: "EX_TESTE",
       columns: [{
         name: "id",
@@ -147,9 +148,9 @@ Recurso de DML é usado para criação, update e deleção de tabelas.
     }
 
    orcl.createTable({
-     table: data.table, 
-     columns: data.columns, 
-     trigger: data.trigger
+     table: payload.table, 
+     columns: payload.columns, 
+     trigger: payload.trigger
      }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
