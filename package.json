@@ -1,6 +1,6 @@
 {
   "name": "sm-orcl",
-  "version": "1.2.5",
+  "version": "1.2.7",
   "description": "ORCL é uma alternativa simples de executar comandos simples dentro de um banco database Oracle 12x.",
   "main": "sm-orcl.js",
   "scripts": {
@@ -8,5 +8,12 @@
   },
   "author": "Gelson Carlos",
   "license": "MIT",
-  "github": "https://github.com/gelsoncjunior/sm-orcl"
+  "github": "https://github.com/gelsoncjunior/sm-orcl",
+  "keywords": [
+    "oracledb",
+    "oracle",
+    "DML",
+    "querys",
+    "database"
+  ]
 }
