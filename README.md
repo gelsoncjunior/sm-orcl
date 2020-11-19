@@ -111,6 +111,7 @@ ORCL é uma alternativa simples de executar comandos simples dentro de um banco 
 Recurso de DML é usado para criação, update e deleção de tabelas.
 
 - Exemplo de uma nova tabela
+- **ATENÇÃO**: Por default as informações de **nullable**,**pk** e **unique** são **false**
 
 ```javascript
   ...
@@ -145,7 +146,11 @@ Recurso de DML é usado para criação, update e deleção de tabelas.
       trigger: true
     }
 
-   orcl.createTable({table: data.table, columns: data.columns, trigger: data.trigger).then((data)=>{
+   orcl.createTable({
+     table: data.table, 
+     columns: data.columns, 
+     trigger: data.trigger
+     }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
