@@ -193,7 +193,7 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas, pa
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    orcl.truncate_table({
+    orcl.truncate({
       table: "EX_USER"
       }).then((data)=>{
       console.log(data)

@@ -31,7 +31,9 @@ class ORACLE {
 
   search_ora(output) {
     for (let i of output) {
-      for (let x of i) if (x.search('ORA-') !== -1) return { status: 500, data: [], error: x }
+      if (i.search('ORA-') !== -1) return { status: 500, data: [], error: i }
+      if (i.search('no rows selected') !== -1) return { status: 404, data: [], error: i }
+      if (i.search('0 rows deleted') !== -1) return { status: 404, data: [], error: i }
     }
   }
 
@@ -99,6 +101,12 @@ class ORACLE {
     return res
   }
 
+  async truncate({ table }) {
+    let dml = `TRUNCATE TABLE ${table};`
+    let res = await this.sqlplus(dml)
+    return res
+  }
+
   async select({ table, columns, where }) {
     var isExistWhere = ";"
     var objWhere = []
@@ -109,13 +117,14 @@ class ORACLE {
     }
     let query = `select ${col} from ${table}` + isExistWhere
     let res = await this.sqlplus(query)
+    //console.log(res)
     let obj = []
     if (res.data && res.error === '') {
       for (const v of res.data) {
         let newObj = {}
         let data = v.toString().split("|")
         for (let index = 0; index < data.length; index++) {
-          newObj[columns[index]] = data[index]
+          newObj[columns[index]] = data[index].toString().trim()
         }
         obj.push(newObj)
       }
@@ -205,11 +214,7 @@ class ORACLE {
     return res
   }
 
-  async truncate_table({ table }) {
-    let dml = `TRUNCATE TABLE ${table};`
-    let res = await this.sqlplus(dml)
-    return res
-  }
+
 }
 
 module.exports = ORACLE
