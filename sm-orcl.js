@@ -168,12 +168,6 @@ class ORACLE {
     return res
   }
 
-  async delete_table({ table }) {
-    let dml = `DELETE TABLE ${table};`
-    let res = await this.sqlplus(dml)
-    return res
-  }
-
   async truncate_table({ table }) {
     let dml = `TRUNCATE TABLE ${table};`
     let res = await this.sqlplus(dml)
