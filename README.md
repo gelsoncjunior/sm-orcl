@@ -142,10 +142,54 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas.
       trigger: true
     }
 
-   orcl.createTable({
+   orcl.create_table({
      table: payload.table, 
      columns: payload.columns, 
      trigger: payload.trigger
+     }).then((data)=>{
+      console.log(data)
+    }).catch(err => console.error(err))
+  ...
+```
+
+- Exemplo de uma drop table
+- **ATENÇÃO**: Por default as informações de **cascade** são **false**.
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+
+   orcl.drop_table({
+     table: "EX_USER",
+     casc: true
+     }).then((data)=>{
+      console.log(data)
+    }).catch(err => console.error(err))
+  ...
+```
+
+- Exemplo de uma delete table
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+
+   orcl.delete_table({
+     table: "EX_USER"
+     }).then((data)=>{
+      console.log(data)
+    }).catch(err => console.error(err))
+  ...
+```
+
+- Exemplo de uma truncate table
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+
+   orcl.truncate_table({
+     table: "EX_USER"
      }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))

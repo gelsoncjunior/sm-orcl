@@ -155,9 +155,29 @@ class ORACLE {
       /
       `
     }
-    // let res = await this.sqlplus(dml)
-    // return res
-    console.log(dml)
+
+    let res = await this.sqlplus(dml)
+    return res
+  }
+
+  async drop_table({ table, casc }) {
+    let cascConst = ";"
+    if (casc) cascConst = 'CASCADE CONSTRAINTS;'
+    let dml = `DROP TABLE ${table} ${cascConst}`
+    let res = await this.sqlplus(dml)
+    return res
+  }
+
+  async delete_table({ table }) {
+    let dml = `DELETE TABLE ${table};`
+    let res = await this.sqlplus(dml)
+    return res
+  }
+
+  async truncate_table({ table }) {
+    let dml = `TRUNCATE TABLE ${table};`
+    let res = await this.sqlplus(dml)
+    return res
   }
 }
 
