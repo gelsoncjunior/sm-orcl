@@ -30,6 +30,7 @@ class ORACLE {
   }
 
   search_ora(output) {
+    if (!output) return { status: 404, data: [], error: 'Not data found' }
     for (let i of output) {
       if (i.search('ORA-') !== -1) return { status: 500, data: [], error: i }
       if (i.search('no rows selected') !== -1) return { status: 404, data: [], error: i }
@@ -124,9 +125,12 @@ class ORACLE {
         let newObj = {}
         let data = v.toString().split("|")
         for (let index = 0; index < data.length; index++) {
-          newObj[columns[index]] = data[index].toString().trim()
+          if (data[index].search('rows selected') === -1)
+            newObj[columns[index]] = data[index].toString().trim()
+
         }
-        obj.push(newObj)
+        if (Object.values(newObj).length !== 0) obj.push(newObj)
+
       }
       res.data = obj
     }
