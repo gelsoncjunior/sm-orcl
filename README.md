@@ -85,7 +85,6 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-
     let payload = {
       name: 'Fulano Sauro',
       idade: 23,
@@ -93,15 +92,15 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
     }
 
     orcl.query(`
-     inset into ex_user ( name, idade, sexo ) values ( 
-       '${user.name}', '${user.idade}', '${user.sexo}' 
-     );
-     exec EX_CREATEUSER( 
-       name => ${user.name},
-       idade => ${user.idade},
-       sexo => ${user.sexo}
-     );
-     select name from ex_user;
+      inset into ex_user ( name, idade, sexo ) values ( 
+        '${user.name}', '${user.idade}', '${user.sexo}' 
+      );
+      exec EX_CREATEUSER( 
+        name => ${user.name},
+        idade => ${user.idade},
+        sexo => ${user.sexo}
+      );
+      select name from ex_user;
     `).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
@@ -117,7 +116,6 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas.
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-
     let payload = {
       table: "EX_TESTE",
       columns: [{
@@ -142,11 +140,11 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas.
       trigger: true
     }
 
-   orcl.create_table({
-     table: payload.table, 
-     columns: payload.columns, 
-     trigger: payload.trigger
-     }).then((data)=>{
+    orcl.create_table({
+      table: payload.table, 
+      columns: payload.columns, 
+      trigger: payload.trigger
+      }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -158,11 +156,10 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas.
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-
-   orcl.drop_table({
-     table: "EX_USER",
-     casc: true
-     }).then((data)=>{
+    orcl.drop_table({
+      table: "EX_USER",
+      casc: true
+      }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -173,10 +170,9 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas.
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-
-   orcl.delete_table({
-     table: "EX_USER"
-     }).then((data)=>{
+    orcl.delete_table({
+      table: "EX_USER"
+      }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
@@ -187,10 +183,9 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas.
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-
-   orcl.truncate_table({
-     table: "EX_USER"
-     }).then((data)=>{
+    orcl.truncate_table({
+      table: "EX_USER"
+      }).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
