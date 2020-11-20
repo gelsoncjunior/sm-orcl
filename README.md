@@ -17,11 +17,11 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
 ```javascript
   const ORACLE = require('sm-orcl')
   const orcl = new ORACLE({
-    ip_address: '127.0.0.1',
-    username: <username>,
-    passowrd: <password>,
-    service_name: <servicename>,
-    port: <port> //Default is 1521
+    ip_address: '0.0.0.0',
+    username: 'username',
+    passowrd: 'password',
+    service_name: 'servicename',
+    port: 'port' //Default is 1521
   })
 ```
 # Comandos
