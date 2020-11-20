@@ -108,7 +108,7 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
 ```
 
 # DMLs
-Recurso de DML é usado para criação, atualização e deleção de tabelas.
+Recurso de DML é usado para criação, atualização e deleção de tabelas, para usufruir desses comandos é necessário que o usuário informado tenha grant de create/update/delete no schema.
 
 - Exemplo de uma nova tabela
 - **ATENÇÃO**: Por default as informações de **nullable**, **pk** e **unique** são **false**
