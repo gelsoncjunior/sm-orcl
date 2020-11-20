@@ -82,6 +82,27 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
   ...
 ```
 
+- Exemplo de select
+- A causula where está limitado somente a **igualdade** nesta release.
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+    let payload = {
+      table: "EX_USER",
+      columns: ["id", "name", "email_address", "modified_date", "created_by"],
+      where: {
+        name: "Fulano",
+        email_address: "fulano@ciclano.me"
+      }
+    }
+    
+    orcl.sekect(payload).then((data)=>{
+      console.log(data)
+    }).catch(err => console.error(err))
+  ...
+```
+
 - Exemplo de query native
 
 ```javascript

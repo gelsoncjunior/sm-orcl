@@ -1,11 +1,22 @@
 const util = require('util');
+const os = require('os');
+
+const sys = {
+  darwin: 'export',
+  win32: 'set'
+}
+
 const execPromissse = util.promisify(require('child_process').exec)
 
 var error = ""
 var data = ""
 
 async function exec(command) {
-  const { error, stdout, stderr } = await execPromissse(command)
+  var { error, stdout, stderr } = await execPromissse(command)
+  if (stdout) {
+    let cacheStdout = stdout.replace(/\t/g, ' ').split("\n").filter(el => { return el != '' })
+    stdout = cacheStdout
+  }
   return { error, stdout, stderr }
 }
 
@@ -26,11 +37,11 @@ class ORACLE {
 
   async sqlplus(sql) {
     try {
-      const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" << EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
-      data = response.split("\n").map(arry => { return arry.split("\t") }).filter(el => { return el != '' })
-      //console.log(data)
+      const response = await (await exec(`${sys[os.platform()]} NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
+      data = response//.split("\n").map(arry => { return arry.split("\t") }).filter(el => { return el != '' })
+      //console.log(response)
       if (this.search_ora(data)) return this.search_ora(data)
-      return { status: 200, data: data[0], error: error }
+      return { status: 200, data: data, error: error }
     } catch (error) {
       console.log(error)
       return { status: 500, data: data, error: "Internal Server Error" }
@@ -88,8 +99,34 @@ class ORACLE {
     return res
   }
 
+  async select({ table, columns, where }) {
+    var isExistWhere = ";"
+    var objWhere = []
+    let col = Array.from(columns).join(',').replace(/,/g, "||'|'||")
+    if (where) {
+      objWhere = this.objToArrayWithComparisionOfAny(where)
+      isExistWhere = " where " + objWhere.join(',').replace(/,/g, ' and ') + ";"
+    }
+    let query = `select ${col} from ${table}` + isExistWhere
+    let res = await this.sqlplus(query)
+    let obj = []
+    if (res.data && res.error === '') {
+      for (const v of res.data) {
+        let newObj = {}
+        let data = v.toString().split("|")
+        for (let index = 0; index < data.length; index++) {
+          newObj[columns[index]] = data[index]
+        }
+        obj.push(newObj)
+      }
+      res.data = obj
+    }
+
+    return res
+  }
+
   async query(query) {
-    var scape
+    var scape = ""
     if (query.search('begin') !== -1) scape = "/"
     let res = await this.sqlplus(`${query} \n ${scape}`)
     return res
