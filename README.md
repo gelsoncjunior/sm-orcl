@@ -96,8 +96,8 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
         email_address: "fulano@ciclano.me"
       }
     }
-    
-    orcl.sekect(payload).then((data)=>{
+
+    orcl.select(payload).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
