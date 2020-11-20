@@ -127,22 +127,17 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas.
         nullable: true,
         pk: true,
         unique: true,
+        seq: true
       }, 
       {
         name: "name",
         dataType: "varchar2",
         length: "(50)",
-        nullable: true,
-        pk: false,
-        unique: true,
       }, 
       {
         name: "idade",
         dataType: "number",
         length: "",
-        nullable: false,
-        pk: false,
-        unique: true,
       }],
       trigger: true
     }
