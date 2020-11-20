@@ -26,9 +26,9 @@ class ORACLE {
 
   async sqlplus(sql) {
     try {
-      const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" << EOF \n set pages 0 \n ${sql} \nEOF`)).stdout
+      const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" << EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
       data = response.split("\n").map(arry => { return arry.split("\t") }).filter(el => { return el != '' })
-      console.log(data)
+      //console.log(data)
       if (this.search_ora(data)) return this.search_ora(data)
       return { status: 200, data: data[0], error: error }
     } catch (error) {
@@ -95,13 +95,22 @@ class ORACLE {
     return res
   }
 
-  async createTable({ table, columns, trigger }) {
+  async create_table({ table, columns, trigger }) {
     let columnsTable = []
     let columnsUniq = []
+    let sequence = ""
+    let idPk = ""
     for (const c of columns) {
       let objValue = Object.values(c)
       if (c.pk) {
-        columnsTable.push(`${objValue[0]} ${objValue[1]}${objValue[2]} constraint ${table}_pk primary key`)
+        idPk = c.name
+        columnsTable.push(`${objValue[0]} ${objValue[1]}${objValue[2]} constraint ${table}_PK primary key`)
+        if (c.seq) {
+          sequence = `
+          CREATE SEQUENCE "${table}_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL;
+          /
+          `
+        }
       } else if (c.nullable) {
         columnsTable.push(`${objValue[0]}  ${objValue[1]}${objValue[2]} not null`)
       } else {
@@ -109,7 +118,7 @@ class ORACLE {
       }
 
       if (c.unique && !c.pk) {
-        columnsUniq.push(`alter table ${table} add constraint ${table}_${objValue[0]}_uq unique (${objValue[0]}); \n`)
+        columnsUniq.push(`alter table ${table} add constraint ${table}_${objValue[0].toUpperCase()}_UQ unique (${objValue[0]}); \n`)
       }
     }
     let dml = `
@@ -117,13 +126,15 @@ class ORACLE {
         ${columnsTable}
       );
       /
-
+  
     `
-    if (columnsUniq) {
-      dml = dml + columnsUniq.join(',').replace(/,/g, '')
-    }
+    if (columnsUniq) dml = dml + columnsUniq.join(',').replace(/,/g, '')
+
+    if (sequence) dml = dml + sequence
 
     if (trigger) {
+      let seq_querys = `:new.${idPk} := to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');`
+      if (sequence) seq_querys = `select "${table}_SEQ".nextval into :NEW."${idPk.toUpperCase()}" from sys.dual;`
       dml = dml + `
       create or replace trigger biu_${table}
       before insert or update on ${table}
@@ -131,7 +142,7 @@ class ORACLE {
       begin
           if inserting then
               if :new.id is null then
-                  :new.id := to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+                  ${seq_querys}
               end if;
           end if;
           if updating then
@@ -139,12 +150,15 @@ class ORACLE {
           end if;
       end;
       /
+
+      ALTER TRIGGER  "BIU_${table}" ENABLE
+      /
       `
     }
-    let res = await this.sqlplus(dml)
-    return res
+    // let res = await this.sqlplus(dml)
+    // return res
+    console.log(dml)
   }
-
 }
 
 module.exports = ORACLE
