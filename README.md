@@ -44,12 +44,20 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
 ```javascript
 ...
   const orcl = new Oracle(dbora.auth)
+  let payloadData = {
+    idade: 23
+  }
+  
   let payload = {
     name: 'Fulano Sauro',
     idade: 23,
     sexo: 'masculino'
   }
-  orcl.insert({table: 'ex_user', data: payload}).then((data)=>{
+  orcl.insert({
+      table: 'ex_user', 
+      data: payload, 
+      where: payload // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
+    }).then((data)=>{
     console.log(data)
   }).catch(err => console.error(err))
 ...
@@ -61,7 +69,7 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    let payload = { id: 1, email_address: "fulano@ciclano.me" }
+    let payload = { id: 1, email_address: "fulano@ciclano.me" } // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
     orcl.delete({table: 'ex_user', deleteAll: false, where: payload}).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
@@ -74,7 +82,7 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
-    let payloadData = { email_address: "ciclano@fulano.you" }
+    let payloadData = { email_address: "ciclano@fulano.you" } // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
     let payload = { id: 1, email_address: "fulano@ciclano.me" }
     orcl.update({table: 'ex_user', updateAll: false, where: payload }).then((data)=>{
       console.log(data)
@@ -83,7 +91,6 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
 ```
 
 - Exemplo de select
-- A causula where está limitado somente a **igualdade** nesta release.
 
 ```javascript
   ...
@@ -94,7 +101,7 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
       where: {
         name: "Fulano",
         email_address: "fulano@ciclano.me"
-      }
+      }, // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
     }
 
     orcl.select(payload).then((data)=>{

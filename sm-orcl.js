@@ -25,11 +25,25 @@ class ORACLE {
     this.username = username, this.passowrd = passowrd, this.ip_address = ip_address, this.port = port ?? 1521, this.service_name = service_name
   }
 
+  objToArrayWithComparisionOfAny(data) {
+    let obj = []
+    let objDataKeys = Object.keys(data)
+    let objDataValues = Object.values(data)
+    let idx = 0
+    for (const ky of objDataKeys) {
+      obj.push(`${ky} = \'${objDataValues[idx]}\'`)
+      idx++
+    }
+    return obj
+  }
+
+
   tns_connect() {
     return `${this.username}/${this.passowrd}@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=${this.ip_address})(PORT=${this.port})))(CONNECT_DATA=(SERVICE_NAME=${this.service_name})))`
   }
 
   search_ora(output) {
+    console.log(output)
     if (!output) return { status: 404, data: [], error: 'Not data found' }
     for (let i of output) {
       if (i.search('ORA-') !== -1) return { status: 500, data: [], error: i }
@@ -57,46 +71,50 @@ class ORACLE {
     return { status: 1, output: "Successfully connected" }
   }
 
-  async insert({ table, data }) {
+  async insert({ table, data, where, handsFreeWhere }) {
+    var isExistWhere = ";"
+    var objWhere = []
+
+    if (where) {
+      objWhere = this.objToArrayWithComparisionOfAny(where)
+      isExistWhere = " where " + objWhere.join(',').replace(/,/g, ' and ') + ";"
+    } else if (handsFreeWhere) {
+      isExistWhere = " where " + handsFreeWhere + ";"
+    }
+
     var patchDataValues = `\'${Object.values(data).join(',').replace(/,/g, '\',\'')}\'`
-    let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${patchDataValues} );`)
+    let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${patchDataValues} )` + isExistWhere)
     return res
   }
 
-  objToArrayWithComparisionOfAny(data) {
-    let obj = []
-    let objDataKeys = Object.keys(data)
-    let objDataValues = Object.values(data)
-    let idx = 0
-    for (const ky of objDataKeys) {
-      obj.push(`${ky} = \'${objDataValues[idx]}\'`)
-      idx++
-    }
-    return obj
-  }
 
-  async update({ table, data, updateAll, where }) {
+
+  async update({ table, data, updateAll, where, handsFreeWhere }) {
     var isExistWhere = ";"
     let objUpdate = this.objToArrayWithComparisionOfAny(data)
     var objWhere = []
     if (updateAll) {
       isExistWhere = ";"
-    } else {
+    } else if (where) {
       objWhere = this.objToArrayWithComparisionOfAny(where)
       isExistWhere = " where " + objWhere.join(',').replace(/,/g, ' and ') + ";"
+    } else if (handsFreeWhere) {
+      isExistWhere = " where " + handsFreeWhere + ";"
     }
     let res = await this.sqlplus(`update ${table} set ${objUpdate} ${isExistWhere}`)
     return res
   }
 
-  async delete({ table, deleteAll, where }) {
+  async delete({ table, deleteAll, where, handsFreeWhere }) {
     var isExistWhere = ";"
     var objWhere = []
     if (deleteAll) {
       isExistWhere = ";"
-    } else {
+    } else if (where) {
       objWhere = this.objToArrayWithComparisionOfAny(where)
       isExistWhere = " where " + objWhere.join(',').replace(/,/g, ' and ') + ";"
+    } else if (handsFreeWhere) {
+      isExistWhere = " where " + handsFreeWhere + ";"
     }
     let res = await this.sqlplus('delete ' + table + isExistWhere)
     return res
@@ -108,17 +126,22 @@ class ORACLE {
     return res
   }
 
-  async select({ table, columns, where }) {
+  async select({ table, columns, where, handsFreeWhere }) {
     var isExistWhere = ";"
     var objWhere = []
-    let col = Array.from(columns).join(',').replace(/,/g, "||'|'||")
+    let col = Array.from(columns).map((arry, idx) => {
+      if (idx !== columns.length - 1) return arry + "||'|'||"
+      return arry
+    }).join(',').replace(/,/g, '').trim()
     if (where) {
       objWhere = this.objToArrayWithComparisionOfAny(where)
       isExistWhere = " where " + objWhere.join(',').replace(/,/g, ' and ') + ";"
+    } else if (handsFreeWhere) {
+      isExistWhere = " where " + handsFreeWhere + ";"
     }
-    let query = `select ${col} from ${table}` + isExistWhere
+    let query = `select ${col.replace(/[ ]/g, ",")} from ${table}` + isExistWhere
     let res = await this.sqlplus(query)
-    //console.log(res)
+
     let obj = []
     if (res.data && res.error === '') {
       for (const v of res.data) {
