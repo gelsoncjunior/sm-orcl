@@ -6,6 +6,8 @@ sm-orcl é uma alternativa simples de executar comandos simples dentro de um ban
 
 É necessário que tenha instalado o cliente SQLPlus correspondente ao seu banco de dados.
 
+* <a href="https://docs.oracle.com/cd/B19306_01/server.102/b14357/ape.htm">How to install SQLPlus client</a>
+
 # Instalação
 
 Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
