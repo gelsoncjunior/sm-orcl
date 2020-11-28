@@ -37,17 +37,15 @@ class ORACLE {
     return obj
   }
 
-
   tns_connect() {
     return `${this.username}/${this.passowrd}@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=${this.ip_address})(PORT=${this.port})))(CONNECT_DATA=(SERVICE_NAME=${this.service_name})))`
   }
 
   search_ora(output) {
-    console.log(output)
     if (!output) return { status: 404, data: [], error: 'Not data found' }
     for (let i of output) {
       if (i.search('ORA-') !== -1) return { status: 500, data: [], error: i }
-      if (i.search('no rows selected') !== -1) return { status: 404, data: [], error: i }
+      if (!output) return { status: 404, data: [], error: 'Not data found' }
       if (i.search('0 rows deleted') !== -1) return { status: 404, data: [], error: i }
     }
   }
@@ -55,8 +53,7 @@ class ORACLE {
   async sqlplus(sql) {
     try {
       const response = await (await exec(`${sys[os.platform()]} NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
-      data = response//.split("\n").map(arry => { return arry.split("\t") }).filter(el => { return el != '' })
-      //console.log(response)
+      data = response
       if (this.search_ora(data)) return this.search_ora(data)
       return { status: 200, data: data, error: error }
     } catch (error) {
@@ -81,13 +78,14 @@ class ORACLE {
     } else if (handsFreeWhere) {
       isExistWhere = " where " + handsFreeWhere + ";"
     }
-
-    var patchDataValues = `\'${Object.values(data).join(',').replace(/,/g, '\',\'')}\'`
-    let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${patchDataValues} )` + isExistWhere)
+    let valuesData = ""
+    for (const value of Object.values(data)) {
+      valuesData = valuesData + ',' + `"${value}"`
+    }
+    console.log(`inser into ${table} (${Object.keys(data)}) values (${valuesData.replace(",", "")})` + isExistWhere)
+    let res //= await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${patchDataValues} )` + isExistWhere)
     return res
   }
-
-
 
   async update({ table, data, updateAll, where, handsFreeWhere }) {
     var isExistWhere = ";"
