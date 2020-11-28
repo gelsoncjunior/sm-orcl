@@ -82,8 +82,7 @@ class ORACLE {
     for (const value of Object.values(data)) {
       valuesData = valuesData + ',' + `"${value}"`
     }
-    console.log(`inser into ${table} (${Object.keys(data)}) values (${valuesData.replace(",", "")})` + isExistWhere)
-    let res //= await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${patchDataValues} )` + isExistWhere)
+    let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${patchDataValues} )` + isExistWhere)
     return res
   }
 
