@@ -41,12 +41,13 @@ class ORACLE {
     return `${this.username}/${this.passowrd}@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=${this.ip_address})(PORT=${this.port})))(CONNECT_DATA=(SERVICE_NAME=${this.service_name})))`
   }
 
-  search_ora(output) {
+  checkIrregularity(output) {
     if (!output) return { status: 404, data: [], error: 'Not data found' }
     for (let i of output) {
       if (i.search('ORA-') !== -1) return { status: 500, data: [], error: i }
       if (!output) return { status: 404, data: [], error: 'Not data found' }
       if (i.search('0 rows deleted') !== -1) return { status: 404, data: [], error: i }
+      if (i.search('no rows selected') !== -1) return { status: 404, data: [], error: i }
     }
   }
 
@@ -54,7 +55,7 @@ class ORACLE {
     try {
       const response = await (await exec(`${sys[os.platform()]} NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
       data = response
-      if (this.search_ora(data)) return this.search_ora(data)
+      if (this.checkIrregularity(data)) return this.checkIrregularity(data)
       return { status: 200, data: data, error: error }
     } catch (error) {
       console.log(error)
