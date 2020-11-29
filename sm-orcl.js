@@ -159,12 +159,12 @@ class ORACLE {
     return res
   }
 
-  async query(query) {
-    var scape = ""
-    if (query.search('begin') !== -1) scape = "/"
-    let res = await this.sqlplus(`${query} \n ${scape}`)
-    return res
-  }
+  // async query(query) {
+  //   var scape = ""
+  //   if (query.search('begin') !== -1) scape = "/"
+  //   let res = await this.sqlplus(`${query} \n ${scape}`)
+  //   return res
+  // }
 
   async create_table({ table, columns, trigger }) {
     let columnsTable = []
