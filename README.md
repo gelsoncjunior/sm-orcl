@@ -123,7 +123,7 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
          name: 'Fulano Sauro',
          idade: 23,
          sexo: 'masculino'
-         } // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
+         }
     }
 
     orcl.exec_procedure(payload).then((data)=>{
@@ -143,7 +143,7 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
          name: 'Fulano Sauro',
          idade: 23,
          sexo: 'masculino'
-         } // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
+         } 
     }
 
     orcl.exec_procedure(payload).then((data)=>{
