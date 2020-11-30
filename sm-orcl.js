@@ -1,12 +1,12 @@
 const util = require('util');
 const os = require('os');
 
+const execPromissse = util.promisify(require('child_process').exec)
+
 const sys = {
   darwin: 'export',
   win32: 'set'
 }
-
-const execPromissse = util.promisify(require('child_process').exec)
 
 var error = ""
 var data = ""
@@ -25,13 +25,15 @@ class ORACLE {
     this.username = username, this.passowrd = passowrd, this.ip_address = ip_address, this.port = port ?? 1521, this.service_name = service_name
   }
 
-  objToArrayWithComparisionOfAny(data) {
+  objToArrayWithComparisionOfAny(data, flag) {
+    let caracter = "="
+    if (flag) caracter = flag
     let obj = []
     let objDataKeys = Object.keys(data)
     let objDataValues = Object.values(data)
     let idx = 0
     for (const ky of objDataKeys) {
-      obj.push(`${ky} = \'${objDataValues[idx]}\'`)
+      obj.push(`${ky} ${caracter} \'${objDataValues[idx]}\'`)
       idx++
     }
     return obj
@@ -148,14 +150,26 @@ class ORACLE {
         for (let index = 0; index < data.length; index++) {
           if (data[index].search('rows selected') === -1)
             newObj[columns[index]] = data[index].toString().trim()
-
         }
         if (Object.values(newObj).length !== 0) obj.push(newObj)
 
       }
       res.data = obj
     }
+    return res
+  }
 
+  async exec_procedure({ procedure_name, data }) {
+    let value = this.objToArrayWithComparisionOfAny(data, '=>')
+    let query = `begin \n execute ${procedure_name}(${value});\n end;`
+    let res = await this.sqlplus(query)
+    return res
+  }
+
+  async exec_function({ procedure_name, data }) {
+    let value = this.objToArrayWithComparisionOfAny(data, '=>')
+    let query = `select ${procedure_name}(${value}) from dual;`
+    let res = await this.sqlplus(query)
     return res
   }
 
@@ -231,8 +245,6 @@ class ORACLE {
     let res = await this.sqlplus(dml)
     return res
   }
-
-
 }
 
 module.exports = ORACLE
