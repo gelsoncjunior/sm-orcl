@@ -112,28 +112,41 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
   ...
 ```
 
-- Exemplo de query native
+- Exemplo de execute procedure
 
 ```javascript
   ...
     const orcl = new Oracle(dbora.auth)
     let payload = {
-      name: 'Fulano Sauro',
-      idade: 23,
-      sexo: 'masculino'
+      procedure_name: "CREATE_USER",
+      data: {
+         name: 'Fulano Sauro',
+         idade: 23,
+         sexo: 'masculino'
+         } // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
     }
 
-    orcl.query(`
-      inset into ex_user ( name, idade, sexo ) values ( 
-        '${user.name}', '${user.idade}', '${user.sexo}' 
-      );
-      exec EX_CREATEUSER( 
-        name => ${user.name},
-        idade => ${user.idade},
-        sexo => ${user.sexo}
-      );
-      select name from ex_user;
-    `).then((data)=>{
+    orcl.exec_procedure(payload).then((data)=>{
+      console.log(data)
+    }).catch(err => console.error(err))
+  ...
+```
+
+- Exemplo de execute exec_function
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+    let payload = {
+      procedure_name: "CREATE_USER",
+      data: {
+         name: 'Fulano Sauro',
+         idade: 23,
+         sexo: 'masculino'
+         } // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
+    }
+
+    orcl.exec_procedure(payload).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
