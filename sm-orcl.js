@@ -166,9 +166,9 @@ class ORACLE {
     return res
   }
 
-  async exec_function({ procedure_name, data }) {
+  async exec_function({ function_name, data }) {
     let value = this.objToArrayWithComparisionOfAny(data, '=>')
-    let query = `select ${procedure_name}(${value}) from dual;`
+    let query = `select ${function_name}(${value}) from dual;`
     let res = await this.sqlplus(query)
     return res
   }
