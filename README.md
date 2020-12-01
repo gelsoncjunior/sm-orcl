@@ -138,7 +138,7 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
   ...
     const orcl = new Oracle(dbora.auth)
     let payload = {
-      procedure_name: "CREATE_USER",
+      function_name: "CREATE_USER",
       data: {
          name: 'Fulano Sauro',
          idade: 23,
