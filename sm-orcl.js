@@ -1,12 +1,5 @@
 const util = require('util');
-const os = require('os');
-
 const execPromissse = util.promisify(require('child_process').exec)
-
-const sys = {
-  darwin: 'export',
-  win32: 'set'
-}
 
 var error = ""
 var data = ""
@@ -25,9 +18,9 @@ class ORACLE {
     this.username = username, this.passowrd = passowrd, this.ip_address = ip_address, this.port = port ?? 1521, this.service_name = service_name
   }
 
-  objToArrayWithComparisionOfAny(data, flag) {
+  objToArrayWithComparisionOfAny(data, arrow) {
     let caracter = "="
-    if (flag) caracter = flag
+    if (arrow) caracter = arrow
     let obj = []
     let objDataKeys = Object.keys(data)
     let objDataValues = Object.values(data)
@@ -46,8 +39,8 @@ class ORACLE {
   checkIrregularity(output) {
     if (!output) return { status: 404, data: [], error: 'Not data found' }
     for (let i of output) {
-      if (i.search('ORA-') !== -1) return { status: 500, data: [], error: i }
       if (!output) return { status: 404, data: [], error: 'Not data found' }
+      if (i.search('ORA-') !== -1) return { status: 500, data: [], error: i }
       if (i.search('0 rows deleted') !== -1) return { status: 404, data: [], error: i }
       if (i.search('no rows selected') !== -1) return { status: 404, data: [], error: i }
     }
@@ -55,12 +48,12 @@ class ORACLE {
 
   async sqlplus(sql) {
     try {
-      const response = await (await exec(`${sys[os.platform()]} NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
+      const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
       data = response
       if (this.checkIrregularity(data)) return this.checkIrregularity(data)
       return { status: 200, data: data, error: error }
     } catch (error) {
-      console.log(error)
+      //console.log(error)
       return { status: 500, data: data, error: "Internal Server Error" }
     }
   }
