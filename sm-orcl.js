@@ -53,7 +53,6 @@ class ORACLE {
       if (this.checkIrregularity(data)) return this.checkIrregularity(data)
       return { status: 200, data: data, error: error }
     } catch (error) {
-      //console.log(error)
       return { status: 500, data: data, error: "Internal Server Error" }
     }
   }
@@ -65,6 +64,7 @@ class ORACLE {
   }
 
   async insert({ table, data, where, handsFreeWhere }) {
+    let valuesData = ""
     var isExistWhere = ";"
     var objWhere = []
 
@@ -74,12 +74,12 @@ class ORACLE {
     } else if (handsFreeWhere) {
       isExistWhere = " where " + handsFreeWhere + ";"
     }
-    let valuesData = ""
-    for (const value of Object.values(data)) {
-      valuesData = valuesData + ',' + `'${value}'`
-    }
+
+    for (const value of Object.values(data)) valuesData = valuesData + ',' + `'${value}'`
+
     let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${valuesData.replace(",", "")} )` + isExistWhere)
     return res
+
   }
 
   async update({ table, data, updateAll, where, handsFreeWhere }) {
@@ -161,7 +161,7 @@ class ORACLE {
 
   async exec_function({ function_name, data }) {
     let value = this.objToArrayWithComparisionOfAny(data, '=>')
-    let query = `select ${function_name}(${value}) from dual;`
+    let query = `select ${function_name}(${value}) as response from dual;`
     let res = await this.sqlplus(query)
     return res
   }

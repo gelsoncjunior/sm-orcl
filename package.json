@@ -8,7 +8,11 @@
   },
   "author": "Gelson Carlos",
   "license": "MIT",
-  "github": "https://github.com/gelsoncjunior/sm-orcl",
+  "homepage": "https://github.com/gelsoncjunior/sm-orcl",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gelsoncjunior/sm-orcl"
+  },
   "keywords": [
     "oracledb",
     "oracle",
