@@ -146,7 +146,7 @@ Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
          } 
     }
 
-    orcl.exec_procedure(payload).then((data)=>{
+    orcl.exec_function(payload).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
