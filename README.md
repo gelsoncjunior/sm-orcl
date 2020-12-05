@@ -1,18 +1,18 @@
 # Sobre
 
-sm-orcl é uma alternativa simples de executar comandos simples dentro de um banco database Oracle <= 12.2.0.
+sm-orcl é uma alternativa simples de executar comandos simples dentro de um banco database Oracle  ```<= 12.2.0```.
 
 # Dependências
 
-Somente ambiente linux.
+Esse pacote so funciona em ambiente ```Linux e MacOS``` com o [SQLClient instalado](https://docs.oracle.com/cd/B19306_01/server.102/b14357/ape.htm), em breve será adaptado para inclusão do Windows.
 
 É necessário que tenha instalado o cliente SQLPlus correspondente ao seu banco de dados.
 
-* <a href="https://docs.oracle.com/cd/B19306_01/server.102/b14357/ape.htm">How to install SQLPlus client</a>
+- [How to install SQLPlus client](https://docs.oracle.com/cd/B19306_01/server.102/b14357/ape.htm)
 
 # Instalação
 
-Execute o comando <b>npm i sm-orcl</b> para obter o pacote.
+- Execute o comando para obter o pacote. ``` npm install --save sm-orcl ```
 
 # Usando
 
@@ -222,3 +222,11 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas, pa
     }).catch(err => console.error(err))
   ...
 ```
+
+#Colaboradores
+[![](https://avatars1.githubusercontent.com/u/21075731?s=100&u=4a08ddc1d3d111898e0933a1507e7ef7999bcaf4&v=4)](https://github.com/gelsoncjunior)
+
+#Pague um café
+- Use o PIX, escaneia o QRCode abaixo
+
+<img src="https://i.ibb.co/VVxsZ1f/Whats-App-Image-2020-12-04-at-21-09-50.jpg" height="200" />
