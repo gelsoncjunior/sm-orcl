@@ -1,6 +1,8 @@
 const util = require('util');
+const fs = require('fs')
 const execPromissse = util.promisify(require('child_process').exec)
 
+var path = __dirname + '/generated_tables.json'
 var error = ""
 var data = ""
 
@@ -11,6 +13,13 @@ async function exec(command) {
     stdout = cacheStdout
   }
   return { error, stdout, stderr }
+}
+
+function regErrosDatabase(msg) {
+  let ts = Date()
+  let path = __dirname + '/sm-orclError.log'
+  msg = `[ ${ts} ] > ${msg}`
+  fs.writeFileSync(path, JSON.stringify(msg), err => console.log(err))
 }
 
 class ORACLE {
@@ -37,6 +46,7 @@ class ORACLE {
   }
 
   checkIrregularity(output) {
+    regErrosDatabase(output)
     if (!output) return { status: 404, data: [], error: 'Not data found' }
     for (let i of output) {
       if (!output) return { status: 404, data: [], error: 'Not data found' }
@@ -154,7 +164,7 @@ class ORACLE {
 
   async exec_procedure({ procedure_name, data }) {
     let value = this.objToArrayWithComparisionOfAny(data, '=>')
-    let query = `begin \n execute ${procedure_name}(${value});\n end;`
+    let query = `begin \n ${procedure_name}(${value});\n end; \n/`
     let res = await this.sqlplus(query)
     return res
   }
@@ -240,4 +250,5 @@ class ORACLE {
   }
 }
 
-module.exports = ORACLE
+
+module.exports = ORACLE 

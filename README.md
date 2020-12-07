@@ -1,6 +1,6 @@
 # Sobre
 
-sm-orcl é uma alternativa simples de executar comandos simples dentro de um banco database Oracle  ```<= 12.2.0```.
+sm-orcl é uma alternativa simples de executar comandos simples dentro de um banco database Oracle ```<= 12.2.0```.
 
 # Dependências
 
