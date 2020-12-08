@@ -45,7 +45,6 @@ class ORACLE {
   }
 
   checkIrregularity(output) {
-    regErrosDatabase(output)
     if (!output) return { status: 404, data: [], error: 'Not data found' }
     for (let i of output) {
       if (!output) return { status: 404, data: [], error: 'Not data found' }
@@ -59,6 +58,7 @@ class ORACLE {
     try {
       const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
       data = response
+      if (err) regErrosDatabase(output)
       if (this.checkIrregularity(data)) return this.checkIrregularity(data)
       return { status: 200, data: data, error: error }
     } catch (error) {
