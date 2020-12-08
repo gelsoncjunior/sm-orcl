@@ -56,9 +56,9 @@ class ORACLE {
 
   async sqlplus(sql) {
     try {
-      const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set pages 0 \n set lines 500 \n ${sql} \nEOF`)).stdout
+      const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set long 30000 \n set longchunksize 30000 \n set pages 0 \n set lines 2000 \n ${sql} \nEOF`)).stdout
       data = response
-      if (err) regErrosDatabase(output)
+      if (data.error) regErrosDatabase(output)
       if (this.checkIrregularity(data)) return this.checkIrregularity(data)
       return { status: 200, data: data, error: error }
     } catch (error) {
@@ -131,6 +131,8 @@ class ORACLE {
   async select({ table, columns, where, handsFreeWhere }) {
     var isExistWhere = ";"
     var objWhere = []
+    if (columns[0] === '*') columns = await this.fetchColumnsTable({ table: table })
+
     let col = Array.from(columns).map((arry, idx) => {
       if (idx !== columns.length - 1) return arry + "||'|'||"
       return arry
@@ -159,6 +161,16 @@ class ORACLE {
       res.data = obj
     }
     return res
+  }
+
+  async fetchColumnsTable({ table }) {
+    let descTable = await this.sqlplus(`select COLUMN_NAME from user_tab_columns where table_name = '${table}';`)
+    let arry = []
+    for (const col of descTable.data) {
+      if (col.search('rows selected') === -1)
+        arry.push(col)
+    }
+    return arry
   }
 
   async exec_procedure({ procedure_name, data }) {
