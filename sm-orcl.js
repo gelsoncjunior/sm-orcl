@@ -2,7 +2,6 @@ const util = require('util');
 const fs = require('fs')
 const execPromissse = util.promisify(require('child_process').exec)
 
-var path = __dirname + '/generated_tables.json'
 var error = ""
 var data = ""
 
@@ -17,9 +16,9 @@ async function exec(command) {
 
 function regErrosDatabase(msg) {
   let ts = Date()
-  let path = __dirname + '/sm-orclError.log'
+  let path = __dirname + '/sm-orcl.log'
   msg = `[ ${ts} ] > ${msg}`
-  fs.writeFileSync(path, JSON.stringify(msg), err => console.log(err))
+  fs.appendFileSync(path, `\n${JSON.stringify(msg)}`, err => console.log(err))
 }
 
 class ORACLE {
