@@ -112,6 +112,47 @@ Esse pacote so funciona em ambiente ```Linux e MacOS``` com o [SQLClient instala
   ...
 ```
 
+Exemplo de select retornando todas as colunas, como se fosse: **select * from table_name**
+- **ATENÇÃO**: Se colocar columns **["* ", "outra_coluna"]** vai retornar error, use sempre **["*"]** sozinho!
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+    let payload = {
+      table: "EX_USER",
+      columns: ["*"],
+      where: {
+        name: "Fulano",
+        email_address: "fulano@ciclano.me"
+      }, // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
+    }
+
+    orcl.select(payload).then((data)=>{
+      console.log(data)
+    }).catch(err => console.error(err))
+  ...
+```
+
+Exemplo 2 de select retornando todas as colunas, como se fosse: **select * from table_name**.
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+    let payload = {
+      table: "EX_USER",
+	  // Se não informar a coluna automaticamente interpreta que seja todas as colunas retornadas.
+      where: {
+        name: "Fulano",
+        email_address: "fulano@ciclano.me"
+      }, // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
+    }
+
+    orcl.select(payload).then((data)=>{
+      console.log(data)
+    }).catch(err => console.error(err))
+  ...
+```
+
 - Exemplo de execute procedure
 
 ```javascript
@@ -222,10 +263,6 @@ Recurso de DML é usado para criação, atualização e deleção de tabelas, pa
     }).catch(err => console.error(err))
   ...
 ```
-
-# Colaboradores
-
-[![](https://avatars1.githubusercontent.com/u/21075731?s=100&u=4a08ddc1d3d111898e0933a1507e7ef7999bcaf4&v=4)](https://github.com/gelsoncjunior)
 
 # Pague um café
 

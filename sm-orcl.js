@@ -131,7 +131,7 @@ class ORACLE {
   async select({ table, columns, where, handsFreeWhere }) {
     var isExistWhere = ";"
     var objWhere = []
-    if (columns[0] === '*') columns = await this.fetchColumnsTable({ table: table })
+    if (!columns || columns.length === 1 && columns[0] === '*') columns = await this.fetchColumnsTable({ table: table })
 
     let col = Array.from(columns).map((arry, idx) => {
       if (idx !== columns.length - 1) return arry + "||'|'||"
