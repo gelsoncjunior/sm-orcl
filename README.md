@@ -4,11 +4,11 @@ sm-orcl é uma alternativa simples de executar comandos simples dentro de um ban
 
 # Dependências
 
-Esse pacote so funciona em ambiente ```Linux e MacOS``` com o [SQLClient instalado](https://docs.oracle.com/cd/B19306_01/server.102/b14357/ape.htm), em breve será adaptado para inclusão do Windows.
+- Esse pacote so funciona em ambiente ```Linux e MacOS``` com o [SQLClient instalado](https://docs.oracle.com/cd/B19306_01/server.102/b14357/ape.htm), em breve será adaptado para inclusão do Windows.
 
-É necessário que tenha instalado o cliente SQLPlus correspondente ao seu banco de dados.
+- É necessário que tenha instalado o cliente SQLPlus correspondente ao seu banco de dados.  [How to install SQLPlus client](https://docs.oracle.com/cd/B19306_01/server.102/b14357/ape.htm)
 
-- [How to install SQLPlus client](https://docs.oracle.com/cd/B19306_01/server.102/b14357/ape.htm)
+- Este pacote foi desenvolvido na versão ```v14.8.0``` do nodeJS, recomendamos o uso do ```nvm``` para selecionar a versão a ser utilizada para melhor experiência, execute: ```nvm use v14.8.0``` em seu terminal.
 
 # Instalação
 

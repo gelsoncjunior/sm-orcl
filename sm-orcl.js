@@ -17,8 +17,8 @@ async function exec(command) {
 function regErrosDatabase(msg) {
   let ts = Date()
   let path = __dirname + '/sm-orcl.log'
-  msg = `[ ${ts} ] > ${msg}`
-  fs.appendFileSync(path, `\n${JSON.stringify(msg)}`, err => console.log(err))
+  msg = `\n [ ${ts} ] > ${JSON.stringify(msg)}`
+  fs.appendFileSync(path, msg, err => console.log(err))
 }
 
 class ORACLE {
@@ -58,8 +58,11 @@ class ORACLE {
     try {
       const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set long 30000 \n set longchunksize 30000 \n set pages 0 \n set lines 2000 \n ${sql} \nEOF`)).stdout
       data = response
-      if (data.error) regErrosDatabase(output)
-      if (this.checkIrregularity(data)) return this.checkIrregularity(data)
+      let existIrregularity = this.checkIrregularity(data)
+      if (existIrregularity) {
+        regErrosDatabase(existIrregularity.error)
+        return existIrregularity
+      }
       return { status: 200, data: data, error: error }
     } catch (error) {
       return { status: 500, data: data, error: "Internal Server Error" }
@@ -131,18 +134,21 @@ class ORACLE {
   async select({ table, columns, where, handsFreeWhere }) {
     var isExistWhere = ";"
     var objWhere = []
+
     if (!columns || columns.length === 1 && columns[0] === '*') columns = await this.fetchColumnsTable({ table: table })
 
     let col = Array.from(columns).map((arry, idx) => {
       if (idx !== columns.length - 1) return arry + "||'|'||"
       return arry
     }).join(',').replace(/,/g, '').trim()
+
     if (where) {
       objWhere = this.objToArrayWithComparisionOfAny(where)
       isExistWhere = " where " + objWhere.join(',').replace(/,/g, ' and ') + ";"
     } else if (handsFreeWhere) {
       isExistWhere = " where " + handsFreeWhere + ";"
     }
+
     let query = `select ${col.replace(/[ ]/g, ",")} from ${table}` + isExistWhere
     let res = await this.sqlplus(query)
 
@@ -156,7 +162,6 @@ class ORACLE {
             newObj[columns[index]] = data[index].toString().trim()
         }
         if (Object.values(newObj).length !== 0) obj.push(newObj)
-
       }
       res.data = obj
     }
@@ -164,7 +169,7 @@ class ORACLE {
   }
 
   async fetchColumnsTable({ table }) {
-    let descTable = await this.sqlplus(`select COLUMN_NAME from user_tab_columns where table_name = '${table}';`)
+    let descTable = await this.sqlplus(`select lower(COLUMN_NAME) as COLUMN_NAME from user_tab_columns where table_name = upper('${table}');`)
     let arry = []
     for (const col of descTable.data) {
       if (col.search('rows selected') === -1)
@@ -187,7 +192,7 @@ class ORACLE {
     return res
   }
 
-  async create_table({ table, columns, trigger }) {
+  async create_table({ table_name, columns, trigger }) {
     let columnsTable = []
     let columnsUniq = []
     let sequence = ""
@@ -196,10 +201,10 @@ class ORACLE {
       let objValue = Object.values(c)
       if (c.pk) {
         idPk = c.name
-        columnsTable.push(`${objValue[0]} ${objValue[1]}${objValue[2]} constraint ${table}_PK primary key`)
+        columnsTable.push(`${objValue[0]} ${objValue[1]}${objValue[2]} constraint ${table_name}_PK primary key`)
         if (c.seq) {
           sequence = `
-          CREATE SEQUENCE "${table}_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL;
+          CREATE SEQUENCE "${table_name}_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL;
           /
           `
         }
@@ -210,11 +215,11 @@ class ORACLE {
       }
 
       if (c.unique && !c.pk) {
-        columnsUniq.push(`alter table ${table} add constraint ${table}_${objValue[0].toUpperCase()}_UQ unique (${objValue[0]}); \n`)
+        columnsUniq.push(`alter table ${table_name} add constraint ${table_name}_${objValue[0].toUpperCase()}_UQ unique (${objValue[0]}); \n`)
       }
     }
     let dml = `
-      create table ${table} (
+      create table ${table_name} (
         ${columnsTable}
       );
       /
@@ -226,10 +231,10 @@ class ORACLE {
 
     if (trigger) {
       let seq_querys = `:new.${idPk} := to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');`
-      if (sequence) seq_querys = `select "${table}_SEQ".nextval into :NEW."${idPk.toUpperCase()}" from sys.dual;`
+      if (sequence) seq_querys = `select "${table_name}_SEQ".nextval into :NEW."${idPk.toUpperCase()}" from sys.dual;`
       dml = dml + `
-      create or replace trigger biu_${table}
-      before insert or update on ${table}
+      create or replace trigger biu_${table_name}
+      before insert or update on ${table_name}
       for each row
       begin
           if inserting then
@@ -243,7 +248,7 @@ class ORACLE {
       end;
       /
 
-      ALTER TRIGGER  "BIU_${table}" ENABLE
+      ALTER TRIGGER  "BIU_${table_name}" ENABLE
       /
       `
     }
