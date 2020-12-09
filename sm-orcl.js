@@ -2,11 +2,11 @@ const util = require('util');
 const fs = require('fs')
 const execPromissse = util.promisify(require('child_process').exec)
 
-var error = ""
-var data = ""
+let error = ""
+let data = ""
 
 async function exec(command) {
-  var { error, stdout, stderr } = await execPromissse(command)
+  let { error, stdout, stderr } = await execPromissse(command)
   if (stdout) {
     let cacheStdout = stdout.replace(/\t/g, ' ').split("\n").filter(el => { return el != '' })
     stdout = cacheStdout
@@ -75,10 +75,19 @@ class ORACLE {
     return { status: 1, output: "Successfully connected" }
   }
 
-  async insert({ table, data, where, handsFreeWhere }) {
+  async insert({ table, data }) {
     let valuesData = ""
-    var isExistWhere = ";"
-    var objWhere = []
+
+    for (const value of Object.values(data)) valuesData = valuesData + ',' + `'${value}'`
+
+    let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${valuesData.replace(",", "")} );`)
+    return res
+
+  }
+
+  async insertSelect({ tablePrimary, columnsPrimary, tableSource, columnsSource, where, handsFreeWhere }) {
+    let isExistWhere = ";"
+    let objWhere = []
 
     if (where) {
       objWhere = this.objToArrayWithComparisionOfAny(where)
@@ -87,17 +96,14 @@ class ORACLE {
       isExistWhere = " where " + handsFreeWhere + ";"
     }
 
-    for (const value of Object.values(data)) valuesData = valuesData + ',' + `'${value}'`
-
-    let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${valuesData.replace(",", "")} )` + isExistWhere)
+    let res = await this.sqlplus(`insert into ${tablePrimary} ( ${columnsPrimary} ) select ${columnsSource} from ${tableSource} ${isExistWhere}`)
     return res
-
   }
 
   async update({ table, data, updateAll, where, handsFreeWhere }) {
-    var isExistWhere = ";"
+    let isExistWhere = ";"
     let objUpdate = this.objToArrayWithComparisionOfAny(data)
-    var objWhere = []
+    let objWhere = []
     if (updateAll) {
       isExistWhere = ";"
     } else if (where) {
@@ -111,8 +117,8 @@ class ORACLE {
   }
 
   async delete({ table, deleteAll, where, handsFreeWhere }) {
-    var isExistWhere = ";"
-    var objWhere = []
+    let isExistWhere = ";"
+    let objWhere = []
     if (deleteAll) {
       isExistWhere = ";"
     } else if (where) {
@@ -132,8 +138,8 @@ class ORACLE {
   }
 
   async select({ table, columns, where, handsFreeWhere }) {
-    var isExistWhere = ";"
-    var objWhere = []
+    let isExistWhere = ";"
+    let objWhere = []
 
     if (!columns || columns.length === 1 && columns[0] === '*') columns = await this.fetchColumnsTable({ table: table })
 

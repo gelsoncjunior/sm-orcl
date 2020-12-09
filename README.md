@@ -65,6 +65,31 @@ sm-orcl é uma alternativa simples de executar comandos simples dentro de um ban
 ...
 ```
 
+- Exemplo de insert com select
+
+```javascript
+...
+  const orcl = new Oracle(dbora.auth)
+  let payloadData = {
+    idade: 23
+  }
+  
+  let payload = {
+    idade: 23,
+    sexo: 'masculino'
+  }
+  orcl.insert({
+      tablePrimary: 'ex_user',
+	  columnsPrimary: ["name", "email_address"],
+	  tableSource: 'ex_client',
+	  columnsSource: ["name", "email_address"],
+      where: payload // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
+    }).then((data)=>{
+    console.log(data)
+  }).catch(err => console.error(err))
+...
+```
+
 - Exemplo de delete com/sem where
 - Se informar que **deleteAll**:**false** vai respeitar a regra do where se estiver como **deleteAll**:**true** ele irá ignorar o where.
 

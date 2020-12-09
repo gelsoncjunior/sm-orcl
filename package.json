@@ -1,10 +1,10 @@
 {
   "name": "sm-orcl",
-  "version": "1.4.2",
+  "version": "1.4.4",
   "description": "sm-orcl é uma alternativa simples de executar comandos simples dentro de um banco database Oracle <=12x.",
   "main": "sm-orcl.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "teste": ""
   },
   "author": "Gelson Carlos",
   "license": "MIT",
@@ -16,8 +16,9 @@
   "keywords": [
     "oracledb",
     "oracle",
-    "DML",
+    "dml",
     "querys",
-    "database"
+    "database",
+    "ORM"
   ]
 }
