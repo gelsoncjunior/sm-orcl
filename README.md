@@ -78,7 +78,7 @@ sm-orcl é uma alternativa simples de executar comandos simples dentro de um ban
     idade: 23,
     sexo: 'masculino'
   }
-  orcl.insert({
+  orcl.insertSelect({
       tablePrimary: 'ex_user',
 	  columnsPrimary: ["name", "email_address"],
 	  tableSource: 'ex_client',
@@ -131,7 +131,7 @@ sm-orcl é uma alternativa simples de executar comandos simples dentro de um ban
       }, // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
     }
 
-    orcl.insertSelect(payload).then((data)=>{
+    orcl.select(payload).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
