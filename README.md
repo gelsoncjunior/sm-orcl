@@ -131,7 +131,7 @@ sm-orcl é uma alternativa simples de executar comandos simples dentro de um ban
       }, // Ou use handsFreeWhere Ex: handsFreeWhere: `id = 1 and name = "Fulano"`
     }
 
-    orcl.select(payload).then((data)=>{
+    orcl.insertSelect(payload).then((data)=>{
       console.log(data)
     }).catch(err => console.error(err))
   ...
