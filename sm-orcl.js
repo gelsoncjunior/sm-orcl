@@ -137,9 +137,14 @@ class ORACLE {
     return res
   }
 
-  async select({ table, columns, where, handsFreeWhere }) {
+  async select({ table, columns, where, handsFreeWhere, offset, offSetReturn }) {
     let isExistWhere = ";"
     let objWhere = []
+    let pagOffset
+
+    if (offset && offSetReturn) {
+      pagOffset = `offset ${offset * offSetReturn} rows fetch next ${offSetReturn} rows only`
+    }
 
     if (!columns || columns.length === 1 && columns[0] === '*') columns = await this.fetchColumnsTable({ table: table })
 
@@ -155,7 +160,7 @@ class ORACLE {
       isExistWhere = " where " + handsFreeWhere + ";"
     }
 
-    let query = `select ${col.replace(/[ ]/g, ",")} from ${table}` + isExistWhere
+    let query = `select ${col.replace(/[ ]/g, ",")} from ${table} ` + pagOffset + isExistWhere
     let res = await this.sqlplus(query)
 
     let obj = []
