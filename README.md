@@ -230,6 +230,31 @@ Ex:
 
 ------------
 
+- Exemplo de select offset (paginação)
+
+```javascript
+  ...
+    const orcl = new Oracle(dbora.auth)
+	
+   let response = await orcl.selectOffSet({
+   		table: "TEST_USER", 
+		columns: ["ID", "NAME"], 
+		offset: 0, 
+		offSetReturn: 50
+	})
+  ...
+```
+Obs: o parametro ```offset``` é o número da página e o ```offSetReturn``` é a quantidade de registros que irá retornar. Lembrando que o valor colocado no offset será a quantidade multiplicada pelo o que foi inserido em offSetReturn, forçando que a quantidade de retorno não repita os mesmo valores.
+
+```javascript
+...
+offset: 2, // 1 x 50 = 50 quando for para 2 x 50 = 100 não exibirá os dados dos 50 anteriores.
+offSetReturn: 50 // quantidade de registro que irá retornar
+...
+```
+
+------------
+
 - Exemplo de execute Procedure
 
 ```javascript
