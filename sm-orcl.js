@@ -78,7 +78,7 @@ class ORACLE {
   async insert({ table, data }) {
     let valuesData = ""
 
-    if (data.length != undefined && data.length > 1) {
+    if (data.length != undefined && data.length > 0) {
       let selects = []
       let selectsResolved = []
       for (let i of data) {
@@ -104,6 +104,8 @@ select * from (
 commit;
 ALTER SESSION DISABLE PARALLEL DML;
 `
+
+      console.log(sql)
       let number_random = Math.round(Math.random() * 1000)
       let file_name = __dirname + '/insert_sql_' + number_random + '.sql'
       fs.writeFileSync(file_name, sql, err => console.log(err))
@@ -262,71 +264,6 @@ ALTER SESSION DISABLE PARALLEL DML;
     let value = this.objToArrayWithComparisionOfAny(data, '=>')
     let query = `select ${function_name}(${value}) as response from dual;`
     let res = await this.sqlplus(query)
-    return res
-  }
-
-  async create_table({ table_name, columns, trigger }) {
-    let columnsTable = []
-    let columnsUniq = []
-    let sequence = ""
-    let idPk = ""
-    for (const c of columns) {
-      let objValue = Object.values(c)
-      if (c.pk) {
-        idPk = c.name
-        columnsTable.push(`${objValue[0]} ${objValue[1]}${objValue[2]} constraint ${table_name}_PK primary key`)
-        if (c.seq) {
-          sequence = `
-          CREATE SEQUENCE "${table_name}_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL;
-          /
-          `
-        }
-      } else if (c.nullable) {
-        columnsTable.push(`${objValue[0]}  ${objValue[1]}${objValue[2]} not null`)
-      } else {
-        columnsTable.push(`${objValue[0]}  ${objValue[1]}${objValue[2]}`)
-      }
-
-      if (c.unique && !c.pk) {
-        columnsUniq.push(`alter table ${table_name} add constraint ${table_name}_${objValue[0].toUpperCase()}_UQ unique (${objValue[0]}); \n`)
-      }
-    }
-    let dml = `
-      create table ${table_name} (
-        ${columnsTable}
-      );
-      /
-  
-    `
-    if (columnsUniq) dml = dml + columnsUniq.join(',').replace(/,/g, '')
-
-    if (sequence) dml = dml + sequence
-
-    if (trigger) {
-      let seq_querys = `:new.${idPk} := to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');`
-      if (sequence) seq_querys = `select "${table_name}_SEQ".nextval into :NEW."${idPk.toUpperCase()}" from sys.dual;`
-      dml = dml + `
-      create or replace trigger biu_${table_name}
-      before insert or update on ${table_name}
-      for each row
-      begin
-          if inserting then
-              if :new.id is null then
-                  ${seq_querys}
-              end if;
-          end if;
-          if updating then
-              null;
-          end if;
-      end;
-      /
-
-      ALTER TRIGGER  "BIU_${table_name}" ENABLE
-      /
-      `
-    }
-
-    let res = await this.sqlplus(dml)
     return res
   }
 
