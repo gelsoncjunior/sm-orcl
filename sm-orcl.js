@@ -105,7 +105,6 @@ commit;
 ALTER SESSION DISABLE PARALLEL DML;
 `
 
-      console.log(sql)
       let number_random = Math.round(Math.random() * 1000)
       let file_name = __dirname + '/insert_sql_' + number_random + '.sql'
       fs.writeFileSync(file_name, sql, err => console.log(err))
