@@ -78,6 +78,40 @@ class ORACLE {
   async insert({ table, data }) {
     let valuesData = ""
 
+    if (data.length != undefined && data.length > 1) {
+      let selects = []
+      let selectsResolved = []
+      for (let i of data) {
+        let values = ""
+        for (let vlr of Object.values(i)) values = `${values} '${vlr}',`
+        selects.push(`select ${values} from dual union all`.replace(', from', ' from'))
+      }
+      for (let index = 0; index < selects.length; index++) {
+        if (index === selects.length - 1) {
+          selectsResolved.push(selects[index].replace('union all', ''))
+        } else {
+          selectsResolved.push(selects[index])
+        }
+      }
+      let sql = `
+ALTER SESSION FORCE PARALLEL DML PARALLEL 5;
+commit;
+insert /*+ NOAPPEND PARALLEL */
+into ${table}(${Object.keys(data[0])})
+select * from (
+  ${selectsResolved.toString().replace('all,', 'all\n')}
+);
+commit;
+ALTER SESSION DISABLE PARALLEL DML;
+`
+      let number_random = Math.round(Math.random() * 1000)
+      let file_name = __dirname + '/insert_sql_' + number_random + '.sql'
+      fs.writeFileSync(file_name, sql, err => console.log(err))
+      let res = await this.sqlplus(`@"${file_name}"`)
+      fs.unlinkSync(file_name, err => console.log(err))
+      return res
+    }
+
     for (const value of Object.values(data)) valuesData = valuesData + ',' + `'${value}'`
 
     let res = await this.sqlplus(`insert into ${table} ( ${Object.keys(data)} ) values ( ${valuesData.replace(",", "")} );`)
@@ -137,14 +171,42 @@ class ORACLE {
     return res
   }
 
-  async select({ table, columns, where, handsFreeWhere, offset, offSetReturn }) {
-    let isExistWhere = ";"
-    let objWhere = []
+  async selectOffSet({ table, columns, offset, offSetReturn }) {
     let pagOffset
 
     if (offset && offSetReturn) {
       pagOffset = `offset ${offset * offSetReturn} rows fetch next ${offSetReturn} rows only`
     }
+
+    if (!columns || columns.length === 1 && columns[0] === '*') columns = await this.fetchColumnsTable({ table: table })
+
+    let col = Array.from(columns).map((arry, idx) => {
+      if (idx !== columns.length - 1) return arry + "||'|'||"
+      return arry
+    }).join(',').replace(/,/g, '').trim()
+
+    let query = `select ${col.replace(/[ ]/g, ",")} from ${table} ${pagOffset};`
+    let res = await this.sqlplus(query)
+
+    let obj = []
+    if (res.data && res.error === '') {
+      for (const v of res.data) {
+        let newObj = {}
+        let data = v.toString().split("|")
+        for (let index = 0; index < data.length; index++) {
+          if (data[index].search('rows selected') === -1)
+            newObj[columns[index]] = data[index].toString().trim()
+        }
+        if (Object.values(newObj).length !== 0) obj.push(newObj)
+      }
+      res.data = obj
+    }
+    return res
+  }
+
+  async select({ table, columns, where, handsFreeWhere }) {
+    let isExistWhere = ";"
+    let objWhere = []
 
     if (!columns || columns.length === 1 && columns[0] === '*') columns = await this.fetchColumnsTable({ table: table })
 
@@ -160,7 +222,7 @@ class ORACLE {
       isExistWhere = " where " + handsFreeWhere + ";"
     }
 
-    let query = `select ${col.replace(/[ ]/g, ",")} from ${table} ` + pagOffset + isExistWhere
+    let query = `select ${col.replace(/[ ]/g, ",")} from ${table} ${isExistWhere}`
     let res = await this.sqlplus(query)
 
     let obj = []
