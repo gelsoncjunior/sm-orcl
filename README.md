@@ -61,6 +61,36 @@
 ------------
 
 
+- Exemplo de insert com varios dados
+
+```javascript
+...
+  const orcl = new Oracle(dbora.auth)
+  
+  let payload = [{
+    name: 'Fulano Sauro',
+    idade: 23,
+    sexo: 'masculino'
+  },
+  {
+    name: 'Fulana Exemplado',
+    idade: 12,
+    sexo: 'mulher'
+  }]
+  
+ let response = await orcl.insert({ table: 'ex_user',  data: payload, })
+...
+```
+Obs: Ele funcionára mesmo que exista 1 objeto dentro de um array.
+Ex: 
+``` 
+ data: [ { name: "Fulano" } ]
+ ou
+ data: { name: "Fulano" } 
+``` 
+------------
+
+
 - Exemplo de insert com select
 
 ```javascript
@@ -237,66 +267,6 @@ Ex:
     }
 
    let response = await orcl.exec_function(payload)
-  ...
-```
-
-# DMLs
-Recurso de DML é usado para criação, atualização e deleção de tabelas, para usufruir desses comandos é necessário que o usuário informado tenha grant de **create**, **update**, **delete** no schema.
-
-- Exemplo de uma nova tabela
-- **ATENÇÃO**: Por default as informações de **nullable**, **pk** e **unique** são **false**
-
-```javascript
-  ...
-    const orcl = new Oracle(dbora.auth)
-    let payload = {
-      table: "EX_TESTE",
-      columns: [{
-        name: "id",
-        dataType: "number",
-        length: "",
-        nullable: true,
-        pk: true,
-        unique: true,
-        seq: true
-      }, 
-      {
-        name: "name",
-        dataType: "varchar2",
-        length: "(50)",
-      }, 
-      {
-        name: "idade",
-        dataType: "number",
-        length: "",
-      }],
-      trigger: true
-    }
-
-    let response = await orcl.create_table({ table: payload.table, columns: payload.columns, trigger: payload.trigger })
-  ...
-```
-
-------------
-
-- Exemplo de uma drop table
-- **ATENÇÃO**: Por default as informações de **cascade** são **false**.
-
-```javascript
-  ...
-    const orcl = new Oracle(dbora.auth)
-    let response = await orcl.drop_table({ table: "EX_USER", casc: true })
-  ...
-```
-
-------------
-
-- Exemplo de uma truncate table
-
-```javascript
-  ...
-    const orcl = new Oracle(dbora.auth)
-    let response = await orcl.truncate({ table: "EX_USER" })
   ...
 ```
 
