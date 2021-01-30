@@ -55,8 +55,9 @@ class ORACLE {
   }
 
   async sqlplus(sql) {
+    console.log(sql)
     try {
-      const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set long 30000 \n set longchunksize 30000 \n set pages 0 \n set lines 2000 \n ${sql} \nEOF`)).stdout
+      const response = await (await exec(`export NLS_LANG=AMERICAN_AMERICA.UTF8 \n sqlplus -s "${this.tns_connect()}" <<EOF \n set long 35000 \n set longchunksize 30000 \n set pages 0 \n set lines 32767 \n ${sql} \nEOF`)).stdout
       data = response
       let existIrregularity = this.checkIrregularity(data)
       if (existIrregularity) {
@@ -83,9 +84,14 @@ class ORACLE {
       let selectsResolved = []
       for (let i of data) {
         let values = ""
-        for (let vlr of Object.values(i)) values = `${values} '${vlr}',`
+        let ctx = 0
+        for (let vlr of Object.values(i)) {
+          values = `${values} '${vlr}' as ${Object.keys(i)[ctx]},`
+          ctx += 1
+        }
         selects.push(`select ${values} from dual union all`.replace(', from', ' from'))
       }
+
       for (let index = 0; index < selects.length; index++) {
         if (index === selects.length - 1) {
           selectsResolved.push(selects[index].replace('union all', ''))
@@ -93,18 +99,30 @@ class ORACLE {
           selectsResolved.push(selects[index])
         }
       }
+
+      let selectsAll = ""
+      for (let index = 0; index < selectsResolved.length; index++) {
+        if (index === selects.length - 1) {
+          selectsAll = `${selectsAll} ${selectsResolved[index]}`
+        } else {
+          selectsAll = `${selectsAll} ${selectsResolved[index]}\n`
+        }
+
+      }
+
       let sql = `
 ALTER SESSION FORCE PARALLEL DML PARALLEL 5;
 commit;
 insert /*+ NOAPPEND PARALLEL */
 into ${table}(${Object.keys(data[0])})
 select * from (
-  ${selectsResolved.toString().replace('all,', 'all\n')}
+  ${selectsAll}
 );
 commit;
 ALTER SESSION DISABLE PARALLEL DML;
 `
 
+      console.log(sql)
       let number_random = Math.round(Math.random() * 1000)
       let file_name = __dirname + '/insert_sql_' + number_random + '.sql'
       fs.writeFileSync(file_name, sql, err => console.log(err))
@@ -172,7 +190,17 @@ ALTER SESSION DISABLE PARALLEL DML;
     return res
   }
 
-  async selectOffSet({ table, columns, offset, offSetReturn }) {
+  async selectOffSet({ table, columns, offset, offSetReturn, where, handsFreeWhere }) {
+    let isExistWhere
+    let objWhere = []
+
+    if (where) {
+      objWhere = this.objToArrayWithComparisionOfAny(where)
+      isExistWhere = " where " + objWhere.join(',').replace(/,/g, ' and ')
+    } else if (handsFreeWhere) {
+      isExistWhere = " where " + handsFreeWhere
+    }
+
     let pagOffset
 
     if (offset && offSetReturn) {
@@ -186,7 +214,8 @@ ALTER SESSION DISABLE PARALLEL DML;
       return arry
     }).join(',').replace(/,/g, '').trim()
 
-    let query = `select ${col.replace(/[ ]/g, ",")} from ${table} ${pagOffset};`
+    let query = `select ${col.replace(/[ ]/g, ",")} from ${table} ${isExistWhere} ${pagOffset};`
+    console.log(query)
     let res = await this.sqlplus(query)
 
     let obj = []
