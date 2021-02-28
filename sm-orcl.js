@@ -282,15 +282,25 @@ ALTER SESSION DISABLE PARALLEL DML;
   }
 
   async exec_procedure({ procedure_name, data }) {
-    let value = this.objToArrayWithComparisionOfAny(data, '=>')
-    let query = `begin \n ${procedure_name}(${value});\n end; \n/`
+    let value = ''
+    if (data) {
+      value = this.objToArrayWithComparisionOfAny(data, '=>')
+      value = `(${value})`
+    }
+
+    let query = `begin \n ${procedure_name}${value};\n end; \n/`
     let res = await this.sqlplus(query)
     return res
   }
 
   async exec_function({ function_name, data }) {
-    let value = this.objToArrayWithComparisionOfAny(data, '=>')
-    let query = `select ${function_name}(${value}) as response from dual;`
+    let value = ''
+    if (data) {
+      value = this.objToArrayWithComparisionOfAny(data, '=>')
+      value = `(${value})`
+    }
+
+    let query = `select ${function_name}${value} as response from dual;`
     let res = await this.sqlplus(query)
     return res
   }
