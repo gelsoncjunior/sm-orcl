@@ -1,6 +1,6 @@
 {
   "name": "sm-orcl",
-  "version": "1.5.0",
+  "version": "1.5.4",
   "description": "sm-orcl é uma alternativa simples de executar comandos simples dentro de um banco database Oracle <=12x.",
   "main": "sm-orcl.js",
   "scripts": {
